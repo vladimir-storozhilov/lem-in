@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "gcc build active file",
+            "command": "/usr/bin/gcc",
+            "args": [
+                "-g",
+                "${workspaceFolder}/lem_atoi.c",
+                "${workspaceFolder}/lem_split.c",
+                "${workspaceFolder}/lem_in_bfs.c",
+                "${workspaceFolder}/main.c",
+                "${workspaceFolder}/../libft/ft_*.c",
+                "${workspaceFolder}/../get_next_line/get_next_line.c",
+                "-o",
+                "${workspaceFolder}/lem_in"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
