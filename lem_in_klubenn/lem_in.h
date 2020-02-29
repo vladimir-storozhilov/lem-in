@@ -21,7 +21,7 @@ typedef struct		s_links
 
 typedef struct		s_parents
 {
-	struct s_parents *next;
+	// struct s_parents *next;
 	struct s_parents *prev;
 	struct s_lem1	*vertex;
 }					t_parents;
@@ -36,6 +36,7 @@ typedef struct		s_lem1
 	struct s_lem1	*prev;
 	struct s_links	*links;
 	t_parents		*parents;
+	t_parents		*current;
 }					t_lem1;
 
 typedef struct	s_lem0
@@ -62,6 +63,12 @@ typedef struct s_way
 	t_lem1	*vertex;
 	struct s_way *next;
 }				t_way;
+
+typedef struct s_way_holder
+{
+	t_way				*way;
+	struct s_way_holder *next;
+}				t_way_holder;
 
 int		atoi_lem(char *str, t_lem0 *st0);
 char	**split(char *line, char c);
