@@ -19,6 +19,7 @@ typedef struct		s_links
 	struct s_lem1	*connection_room;
 }					t_links;
 
+// gtapioca's structure
 typedef struct		s_parents
 {
 	// struct s_parents *next;
@@ -70,10 +71,15 @@ typedef struct s_way_holder
 	struct s_way_holder *next;
 }				t_way_holder;
 
+// end of gtapioca's structures
+
 int		atoi_lem(char *str, t_lem0 *st0);
 char	**split(char *line, char c);
 void	error_management(t_lem0 *st, char *str);
 int		get_next_line(int fd, char **line);
+
+// gtapioca's functions
 void	breadth_first_search(t_lem0 *st0);
+// end of gtapioca's functions
 
 #endif

@@ -3,6 +3,20 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+void current_vertex_and_queue_initializer(t_lem1 **current_vertex,
+    t_queue **queue, t_queue **buff_queue, t_lem0 *st0)
+{
+    (*current_vertex) = st0->start;
+    (*queue) = (t_queue *)malloc(sizeof(t_queue));
+    (*queue)->vertex = (*current_vertex);
+    (*buff_queue) = (*queue);
+    (*queue)->next = NULL;
+    (*current_vertex)->current = (t_parents *)malloc(sizeof(t_parents));
+    (*current_vertex)->current->prev = NULL;
+    (*current_vertex)->current->vertex = (*current_vertex);
+    (*current_vertex)->parents = NULL;
+}
+
 bool parents_contain_way(t_lem1 *vertex)
 {
     t_parents *parent;
@@ -49,17 +63,106 @@ void queue_deleter(t_queue *queue)
     }
 }
 
+void    ways_creator(t_lem1 *current_vertex, t_lem0 *st0,
+        int *i, t_queue *buff_queue, t_way_holder **way_keeper)
+{
+    t_parents *parent;
+    t_way     *begin_way;
+    t_way     *way2;
+    bool      criterion;
+
+    parent = current_vertex->current;
+    begin_way = (t_way *)malloc(sizeof(t_way));
+    begin_way->vertex = parent->vertex;
+    begin_way->next = 0;
+    parent = parent->prev;
+    while (parent)
+    {
+        way2 = (t_way *)malloc(sizeof(t_way));
+        way2->vertex = parent->vertex;
+        if (parent->vertex != st0->end
+            && parent->vertex != st0->start)
+            way2->vertex->flag = 1;
+        way2->next = begin_way;
+        begin_way = way2;
+        parent = parent->prev;
+    }
+    if (*i == 0)
+    {
+        (*way_keeper)->way = way2;
+        (*way_keeper)->next = 0;
+    }
+    else
+    {
+        (*way_keeper)->next = (t_way_holder *)malloc(sizeof(t_way_holder));
+        (*way_keeper)->next->way = way2;
+        (*way_keeper) = (*way_keeper)->next;
+        (*way_keeper)->next = 0;
+    }
+}
+
+void queue_creator(t_lem1 **current_vertex, t_queue **queue, t_links **buff_links)
+{
+    (*queue)->next = (t_queue *)malloc(sizeof(t_queue));
+    (*queue)->next->vertex = (*buff_links)->connection_room;
+    (*queue)->next->vertex->current = (t_parents *)malloc(sizeof(t_parents));
+    (*queue)->next->vertex->current->prev = (*current_vertex)->current;
+    (*queue)->next->vertex->current->vertex = (*queue)->next->vertex;
+    (*queue)->next->vertex->parents = (*current_vertex)->current;
+    (*queue) = (*queue)->next;
+    (*queue)->next = NULL;
+}
+
+void breadth_first_search_cycle_finder(t_queue **queue,
+    t_queue **buff_queue, t_lem1 **current_vertex, t_lem0 *st0)
+{
+    t_queue *deleter_queue;
+    t_links *buff_links;
+
+    while(*current_vertex != st0->end &&
+        *buff_queue != 0 && *current_vertex != NULL)
+    {
+        deleter_queue = *buff_queue;
+        buff_links = (*current_vertex)->links;
+        while (buff_links != 0)
+        {
+            if (buff_links->connection_room->flag == 0)
+            {
+                if (buff_links->connection_room->parents == 0 &&
+                    buff_links->connection_room != st0->start)
+                {
+                    queue_creator(current_vertex, queue, &buff_links);
+                    // (*queue)->next = (t_queue *)malloc(sizeof(t_queue));
+                    // (*queue)->next->vertex = buff_links->connection_room;
+                    // (*queue)->next->vertex->current = (t_parents *)malloc(sizeof(t_parents));
+                    // (*queue)->next->vertex->current->prev = (*current_vertex)->current;
+                    // (*queue)->next->vertex->current->vertex = (*queue)->next->vertex;
+                    // (*queue)->next->vertex->parents = (*current_vertex)->current;
+                    // (*queue) = (*queue)->next;
+                    // (*queue)->next = NULL;
+                }
+            }
+            buff_links = buff_links->prev;
+        }
+        if (*buff_queue)
+            *buff_queue = (*buff_queue)->next;
+        if (*buff_queue)
+            (*current_vertex) = (*buff_queue)->vertex;
+        free(deleter_queue);
+    }
+}
+
 void breadth_first_search(t_lem0 *st0)
 {
     t_lem1 *current_vertex;
     t_queue *queue;
-    t_links *buff_links;
+    // t_links *buff_links;
     t_queue *buff_queue;
-    t_queue *deleter_queue;
-    t_parents *parent;
-    t_way     *begin_way;
-    t_way     *way2;
-    t_way     *way3;
+    // t_queue *deleter_queue;
+    // t_parents *parent;
+    // t_way     *begin_way;
+    // t_way     *way2;
+    // t_way     *way3;
     t_way_holder *way_keeper;
     t_way_holder *buff_keeper;
     int       i;
@@ -72,77 +175,88 @@ void breadth_first_search(t_lem0 *st0)
     buff_keeper = way_keeper;
     while (criterion)
     {
-        current_vertex = st0->start;
-        queue = (t_queue *)malloc(sizeof(t_queue));
-        queue->vertex = current_vertex;
-        buff_queue = queue;
+        current_vertex_and_queue_initializer(&current_vertex, &queue, &buff_queue, st0);
+        // current_vertex = st0->start;
+        // queue = (t_queue *)malloc(sizeof(t_queue));
+        // queue->vertex = current_vertex;
+        // buff_queue = queue;
+        // queue->next = NULL;
 
-        parent = (t_parents *)malloc(sizeof(t_parents));
-        parent->prev = NULL;
-        parent->vertex = current_vertex;
-        current_vertex->current = parent;
-        current_vertex->parents = NULL;
-        while(current_vertex != st0->end && buff_queue != 0 && current_vertex != NULL)
-        {
-            deleter_queue = buff_queue;
-            buff_links = current_vertex->links;
-            while (buff_links != 0)
-            {
-                if (buff_links->connection_room->flag == 0)
-                {
-                    if (buff_links->connection_room->parents == 0 && buff_links->connection_room != st0->start)
-                    {
-                        queue->next = (t_queue *)malloc(sizeof(t_queue));
-                        queue->next->vertex = buff_links->connection_room;
-                        parent = (t_parents *)malloc(sizeof(t_parents));
-                        parent->prev = current_vertex->current;
-                        parent->vertex = queue->next->vertex;
-                        queue->next->vertex->current = parent;
-                        queue->next->vertex->parents = current_vertex->current;
-                        queue = queue->next;
-                        queue->next = NULL;
-                    }
-                }
-                buff_links = buff_links->prev;
-            }
-            if (buff_queue)
-                buff_queue = buff_queue->next;
-            if (buff_queue)
-                current_vertex = buff_queue->vertex;
-            free(deleter_queue);
-        }
+        // current_vertex->current = (t_parents *)malloc(sizeof(t_parents));
+        // current_vertex->current->prev = NULL;
+        // current_vertex->current->vertex = current_vertex;
+        // current_vertex->parents = NULL;
+        breadth_first_search_cycle_finder(&queue, &buff_queue, &current_vertex, st0);
+    //     while(current_vertex != st0->end && buff_queue != 0 && current_vertex != NULL)
+    //     {
+    //         deleter_queue = buff_queue;
+    //         buff_links = current_vertex->links;
+    //         while (buff_links != 0)
+    //         {
+    //             if (buff_links->connection_room->flag == 0)
+    //             {
+    //                 if (buff_links->connection_room->parents == 0 && buff_links->connection_room != st0->start)
+    //                 {
+    //                     queue->next = (t_queue *)malloc(sizeof(t_queue));
+    //                     queue->next->vertex = buff_links->connection_room;
+    //                     parent = (t_parents *)malloc(sizeof(t_parents));
+    //                     parent->prev = current_vertex->current;
+    //                     parent->vertex = queue->next->vertex;
+    //                     queue->next->vertex->current = parent;
+    //                     queue->next->vertex->parents = current_vertex->current;
+    //                     queue = queue->next;
+    //                     queue->next = NULL;
+    //                 }
+    //             }
+    //             buff_links = buff_links->prev;
+    //         }
+    //         if (buff_queue)
+    //             buff_queue = buff_queue->next;
+    //         if (buff_queue)
+    //             current_vertex = buff_queue->vertex;
+    //         free(deleter_queue);
+    //     }
         if (current_vertex == st0->end)
-        {
-            parent = current_vertex->current;
-            begin_way = (t_way *)malloc(sizeof(t_way));
-            begin_way->vertex = parent->vertex;
-            begin_way->next = 0;
-            parent = parent->prev;
-            while (parent)
-            {
-                way2 = (t_way *)malloc(sizeof(t_way));
-                way2->vertex = parent->vertex;
-                if (parent->vertex != st0->end && parent->vertex != st0->start)
-                    way2->vertex->flag = 1;
-                way2->next = begin_way;
-                begin_way = way2;
-                parent = parent->prev;
-            }
-            if (i == 0)
-                way_keeper->way = way2;
-            else
-            {
-                way_keeper->next = (t_way_holder *)malloc(sizeof(t_way_holder));
-                way_keeper->next->way = way2;
-                way_keeper = way_keeper->next;
-                way_keeper->next = 0;
-            }
-        }
-        if (current_vertex != st0->end)
+            ways_creator(current_vertex, st0, &i, buff_queue, &way_keeper);
+        if ((current_vertex == st0->end && buff_queue->next == 0)
+            || (current_vertex != st0->end))
             criterion = false;
         i = 1;
         parents_deleter(st0);
         queue_deleter(buff_queue);
+        // if (current_vertex == st0->end)
+        // {
+        //     parent = current_vertex->current;
+        //     begin_way = (t_way *)malloc(sizeof(t_way));
+        //     begin_way->vertex = parent->vertex;
+        //     begin_way->next = 0;
+        //     parent = parent->prev;
+        //     while (parent)
+        //     {
+        //         way2 = (t_way *)malloc(sizeof(t_way));
+        //         way2->vertex = parent->vertex;
+        //         if (parent->vertex != st0->end && parent->vertex != st0->start)
+        //             way2->vertex->flag = 1;
+        //         way2->next = begin_way;
+        //         begin_way = way2;
+        //         parent = parent->prev;
+        //     }
+        //     if (i == 0)
+        //         way_keeper->way = way2;
+        //     else
+        //     {
+        //         way_keeper->next = (t_way_holder *)malloc(sizeof(t_way_holder));
+        //         way_keeper->next->way = way2;
+        //         way_keeper = way_keeper->next;
+        //         way_keeper->next = 0;
+        //     }
+        // }
+        // if ((current_vertex == st0->end && buff_queue->next == 0)
+        //     || (current_vertex != st0->end))
+        //     criterion = false;
+        // i = 1;
+        // parents_deleter(st0);
+        // queue_deleter(buff_queue);
     }
     while (buff_keeper)
     {
