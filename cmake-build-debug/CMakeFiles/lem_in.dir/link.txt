@@ -1,0 +1,1 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/lem_in.dir/main.c.o CMakeFiles/lem_in.dir/lem_atoi.c.o CMakeFiles/lem_in.dir/lem_split.c.o  -o lem_in /Users/gtristan/CLionProjects/libft/libft.a 
