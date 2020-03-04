@@ -105,7 +105,8 @@ void	calc_length(t_lem0 *lem0);
 // gtapioca's functions
 void	breadth_first_search(t_lem0 *st0);
 void	breadth_first_search_2(t_lem0 *st0);
-void	shortest_ways_free(t_lem0 *st0);
+// void	shortest_ways_free(t_lem0 *st0);
+void	bfs_expand(t_lem0 *st0);
 // end of gtapioca's functions
 
 #endif

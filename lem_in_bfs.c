@@ -89,10 +89,10 @@ void    ways_creator(t_lem1 *current_vertex, t_lem0 *st0,
     {
         way2 = (t_links *)malloc(sizeof(t_links));
         way2->connection_room = parent->vertex;
-        buff_links = way2->connection_room->links;
-        while(buff_links->connection_room != begin_way->connection_room)
-            buff_links = buff_links->prev;
-        buff_links->weight = -1;
+        // buff_links = way2->connection_room->links;
+        // while(buff_links->connection_room != begin_way->connection_room)
+        //     buff_links = buff_links->prev;
+        // buff_links->weight = -1;
         if (parent->vertex != st0->end
             && parent->vertex != st0->start)
             way2->connection_room->flag = 1;
@@ -282,16 +282,17 @@ void breadth_first_search(t_lem0 *st0)
     st0->solution->next = 0;
     st0->solution->prev = 0;
     st0->solution->sol_links = buff_keeper;
-    while (buff_keeper)
-    {
-        while(buff_keeper->links)
-        {
-            printf("%s ",  buff_keeper->links->connection_room->room_name);
-            buff_keeper->links = buff_keeper->links->next;
-        }
-        printf("\n");
-        buff_keeper = buff_keeper->next;
-    }
+    // while (buff_keeper)
+    // {
+    //     while(buff_keeper->links)
+    //     {
+    //         printf("%s ",  buff_keeper->links->connection_room->room_name);
+    //         buff_keeper->links = buff_keeper->links->next;
+    //     }
+    //     printf("\n");
+    //     buff_keeper = buff_keeper->next;
+    // }
+    bfs_expand(st0);
     // shortest_ways_free(st0);
     // calc_length(st0);
     printf("\n");
