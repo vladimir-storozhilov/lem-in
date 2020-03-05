@@ -87,19 +87,22 @@ void    ways_creator(t_lem1 *current_vertex, t_lem0 *st0,
     parent = parent->prev;
     while (parent)
     {
-        way2 = (t_links *)malloc(sizeof(t_links));
-        way2->connection_room = parent->vertex;
-        // buff_links = way2->connection_room->links;
-        // while(buff_links->connection_room != begin_way->connection_room)
-        //     buff_links = buff_links->prev;
-        // buff_links->weight = -1;
-        if (parent->vertex != st0->end
-            && parent->vertex != st0->start)
-            way2->connection_room->flag = 1;
-        way2->next = begin_way;
-        begin_way->prev = way2;
-        begin_way = way2;
-        way2->prev = 0;
+        if (parent->vertex != st0->start)
+        {
+            way2 = (t_links *)ft_memalloc(sizeof(t_links));
+            way2->connection_room = parent->vertex;
+            // buff_links = way2->connection_room->links;
+            // while(buff_links->connection_room != begin_way->connection_room)
+            //     buff_links = buff_links->prev;
+            // buff_links->weight = -1;
+            if (parent->vertex != st0->end
+                && parent->vertex != st0->start)
+                way2->connection_room->flag = 1;
+            way2->next = begin_way;
+            begin_way->prev = way2;
+            begin_way = way2;
+            way2->prev = 0;
+        }
         parent = parent->prev;
         length += 1;
     }
@@ -112,7 +115,7 @@ void    ways_creator(t_lem1 *current_vertex, t_lem0 *st0,
     }
     else
     {
-        (*way_keeper)->next = (t_sol_links *)malloc(sizeof(t_sol_links));
+        (*way_keeper)->next = (t_sol_links *)ft_memalloc(sizeof(t_sol_links));
         (*way_keeper)->next->links = way2;
         (*way_keeper)->next->prev = (*way_keeper);
         (*way_keeper) = (*way_keeper)->next;
@@ -232,8 +235,8 @@ void breadth_first_search(t_lem0 *st0)
         buff_keeper = buff_keeper->next;
     }
     printf("%d\n", c);
-    bfs_expand(st0);
+    // bfs_expand(st0);
     // shortest_ways_free(st0);
-    // calc_length(st0);
+    calc_length(st0);
     // printf("\n");
 }
