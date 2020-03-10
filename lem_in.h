@@ -7,6 +7,7 @@
 # include "../../libft/libft.h"
 #include <fcntl.h>
 #include <errno.h>
+#include <stdbool.h>
 
 struct s_lem1;
 
@@ -78,6 +79,7 @@ typedef struct	s_lem0
 
 typedef struct s_queue
 {
+	bool	state;
 	t_lem1	*vertex;
 	struct s_queue	*next;
 }				t_queue;

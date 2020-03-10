@@ -80,7 +80,7 @@ void    ways_creator(t_lem1 *current_vertex, t_lem0 *st0,
 
     length = 0;
     parent = current_vertex->current;
-    begin_way = (t_links *)malloc(sizeof(t_links));
+    begin_way = (t_links *)ft_memalloc(sizeof(t_links));
     begin_way->connection_room = parent->vertex;
     begin_way->next = 0;
     begin_way->prev = 0;
@@ -124,10 +124,11 @@ void    ways_creator(t_lem1 *current_vertex, t_lem0 *st0,
     }
 }
 
-void queue_creator(t_lem1 **current_vertex, t_queue **queue, t_links **buff_links)
+void queue_creator(t_lem1 **current_vertex, t_queue **queue, t_links **buff_links, bool state)
 {
     (*queue)->next = (t_queue *)malloc(sizeof(t_queue));
     (*queue)->next->vertex = (*buff_links)->connection_room;
+    (*queue)->next->state = state;
     (*queue)->next->vertex->current = (t_parents *)malloc(sizeof(t_parents));
     (*queue)->next->vertex->current->prev = (*current_vertex)->current;
     (*queue)->next->vertex->current->vertex = (*queue)->next->vertex;
@@ -156,7 +157,7 @@ void breadth_first_search_cycle_finder(t_queue **queue,
                 if (buff_links->connection_room->parents == 0 &&
                     buff_links->connection_room != st0->start)
                 {
-                    queue_creator(current_vertex, queue, &buff_links);
+                    queue_creator(current_vertex, queue, &buff_links, false);
                     // (*queue)->next = (t_queue *)malloc(sizeof(t_queue));
                     // (*queue)->next->vertex = buff_links->connection_room;
                     // (*queue)->next->vertex->current = (t_parents *)malloc(sizeof(t_parents));
@@ -234,9 +235,10 @@ void breadth_first_search(t_lem0 *st0)
         printf("\n");
         buff_keeper = buff_keeper->next;
     }
-    printf("%d\n", c);
-    // bfs_expand(st0);
+    printf("\n");
+    // printf("%d\n", c);
+    bfs_expand(st0);
     // shortest_ways_free(st0);
-    calc_length(st0);
+    // calc_length(st0);
     // printf("\n");
 }

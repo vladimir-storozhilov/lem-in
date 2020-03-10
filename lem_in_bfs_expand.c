@@ -106,8 +106,8 @@ bool    ways_destroyer(t_lem1 *current_vertex)
     parent = current_vertex->current;
     while (parent->prev)
     {
-        if (negative_weigth_finder(parent, parent->prev))
-            return (true);
+        negative_weigth_finder(parent, parent->prev);
+            // return (true);
         parent = parent->prev;
     }
     return (false);
@@ -180,31 +180,96 @@ bool breadth_first_search_cycle_finder_2(t_queue **queue,
     return false;
 }
 
+bool negative_link_checker(t_lem1 *current_vertex, t_links *link)
+{
+    t_links *buff_link;
+
+    buff_link = link->connection_room->links;
+    while (buff_link && buff_link->connection_room != current_vertex)
+        buff_link = buff_link->prev;
+    if (buff_link != 0 && buff_link->weight == -1)
+        return (true);
+    return (false);
+}
+
+t_links *is_vertex_has_negative_links(t_lem1 *current_vertex, t_queue *buff_queue)
+{
+    t_links *buff_link;
+    t_links *buff_link2;
+
+    buff_link = current_vertex->links;
+    while (buff_link != 0)
+    {
+        buff_link2 = buff_link->connection_room->links;
+        while (buff_link2 != 0 && buff_link2->connection_room != current_vertex &&
+                buff_link2->weight != -1)
+             buff_link2 = buff_link2->prev;
+        if (buff_link2 != 0 && buff_link2->weight == -1 &&
+            buff_link2->connection_room == current_vertex && buff_queue->state == false)
+            {
+                if (buff_link->weight != -1)
+                    return (buff_link);
+            }
+        buff_link = buff_link->prev;
+    }
+    return (0);
+}
+
 bool breadth_first_search_cycle_finder_1(t_queue **queue,
     t_queue **buff_queue, t_lem1 **current_vertex, t_lem0 *st0)
 {
     t_queue *deleter_queue;
     t_links *buff_links;
     int y;
+    int j;
 
     y = 0;
+    j = 0;
     while((*current_vertex != st0->end &&
         *buff_queue != 0 && *current_vertex != NULL))
     {
         deleter_queue = *buff_queue;
-        buff_links = (*current_vertex)->links;
-        while (buff_links != 0)
+        if ((*buff_queue)->state == false && (buff_links = is_vertex_has_negative_links(*current_vertex, *buff_queue)))
         {
-            if (buff_links->weight != -1)
+            // if (j == 0)
+            // {
+                queue_creator(current_vertex, queue, &buff_links, true);
+            //     j = 1;
+            // }
+            // else
+            // {
+            //     buff_links = (*current_vertex)->links;
+            //     while (buff_links != 0)
+            //     {
+            //         if (buff_links->weight != -1)
+            //         {
+            //             if (buff_links->connection_room->parents == 0 &&
+            //                 buff_links->connection_room != st0->start)
+            //             {
+            //                 queue_creator(current_vertex, queue, &buff_links);
+            //                 y++;
+            //             }
+            //         }
+            //         buff_links = buff_links->prev;
+            //     }
+            // }
+        }
+        else
+        {
+            buff_links = (*current_vertex)->links;
+            while (buff_links != 0)
             {
-                if (buff_links->connection_room->parents == 0 &&
-                    buff_links->connection_room != st0->start)
+                if (buff_links->weight != -1)
                 {
-                    queue_creator(current_vertex, queue, &buff_links);
-                    y++;
+                    if (buff_links->connection_room->parents == 0 &&
+                        buff_links->connection_room != st0->start)
+                    {
+                        queue_creator(current_vertex, queue, &buff_links, negative_link_checker(*current_vertex, buff_links));
+                        y++;
+                    }
                 }
+                buff_links = buff_links->prev;
             }
-            buff_links = buff_links->prev;
         }
         if (*buff_queue)
             *buff_queue = (*buff_queue)->next;
@@ -263,7 +328,7 @@ void delete_flags(t_lem0 *st0)
         }
         i++;
     }
-    printf("%d\n", j);
+    // printf("%d\n", j);
 }
 
 void ways_weight_modifier(t_lem0 *st0)
@@ -294,7 +359,12 @@ void ways_weight_modifier(t_lem0 *st0)
         }
         buff_sol = buff_sol->next;
     }
-    printf("%d\n", k);
+    buff_link = st0->start->links;
+    while (buff_link && buff_link->connection_room != st0->solution->sol_links->links->connection_room)
+        buff_link = buff_link->prev;
+    if (buff_link != 0)
+        buff_link->weight = -1;
+    // printf("%d\n", k);
 }
 
 void    ways_creator_2(t_lem1 *current_vertex, t_lem0 *st0,
@@ -308,22 +378,25 @@ void    ways_creator_2(t_lem1 *current_vertex, t_lem0 *st0,
 
     length = 0;
     parent = current_vertex->current;
-    begin_way = (t_links *)malloc(sizeof(t_links));
+    begin_way = (t_links *)ft_memalloc(sizeof(t_links));
     begin_way->connection_room = parent->vertex;
     begin_way->next = 0;
     begin_way->prev = 0;
     parent = parent->prev;
     while (parent)
     {
-        way2 = (t_links *)malloc(sizeof(t_links));
-        way2->connection_room = parent->vertex;
-        if (parent->vertex != st0->end
-            && parent->vertex != st0->start)
-            way2->connection_room->flag = 1;
-        way2->next = begin_way;
-        begin_way->prev = way2;
-        begin_way = way2;
-        way2->prev = 0;
+        if (parent->vertex != st0->start)
+        {
+            way2 = (t_links *)ft_memalloc(sizeof(t_links));
+            way2->connection_room = parent->vertex;
+            if (parent->vertex != st0->end
+                && parent->vertex != st0->start)
+                way2->connection_room->flag = 1;
+            way2->next = begin_way;
+            begin_way->prev = way2;
+            begin_way = way2;
+            way2->prev = 0;
+        }
         parent = parent->prev;
         length += 1;
     }
